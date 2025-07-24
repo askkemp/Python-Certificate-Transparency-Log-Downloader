@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="./logo.png" height="100" />
+</p>
+
 # Introduction
 A Python 3.11+ monolithic script to download Certificate Transparency (CT) logs  (see [Certificate Transparency Project]( https://certificate.transparency.dev/ "Certificate Transparency Project")) and extract specific metadata. The below metadata is captured for each certificate:
 
@@ -42,7 +46,7 @@ https://tiger2026h1.ct.sectigo.com/:   1%|█▊      | 457728/57004106 [00:00<1
 Uploading ct_e6bcaf6a-ea8e-4c7c-b292-dbe673fa9a65-2025-07-24.gz to S3 bucket dev
 ```
 
-## Quick start
+# Quick start
 
 ### 1. Clone the repository and install requirements
 ```bash
@@ -59,18 +63,18 @@ Use the included `dockerdocker-compose.yml` to spin up DynamoDB ([scylladb](http
 ```bash
 $ sudo docker compose up -d
 [+] Running 5/5
- ✔ Network ct_default         Created  0.1s
- ✔ Volume "ct_scylladb-data"  Created  0.1s
- ✔ Volume "ct_minio-data"     Created  0.0s
- ✔ Container ct-scylladb-1    Started  0.4s
- ✔ Container ct-minio-1       Started
+ ✔ Network python-certificate-transparency-log-downloader_default         Created  0.1s
+ ✔ Volume "python-certificate-transparency-log-downloader_scylladb-data"  Created  0.0s
+ ✔ Volume "python-certificate-transparency-log-downloader_minio-data"     Created  0.0s
+ ✔ Container python-certificate-transparency-log-downloader-scylladb-1    Started  0.5s
+ ✔ Container python-certificate-transparency-log-downloader-minio-1       Started  
  ```                                  
 
 Generate acccess and secret keys for S3 (minio)
 ```bash
-$ sudo docker exec -it ct-minio-1  mc config host add myminio http://localhost:9000 minioadmin minioadmin
+$ sudo docker exec -it python-certificate-transparency-log-downloader-minio-1   mc config host add myminio http://localhost:9000 minioadmin minioadmin
 Added `myminio` successfully.
-$ sudo docker exec -it ct-minio-1  mc admin accesskey create myminio/ minioadmin  --access-key myuseraccesskey --secret-key myusersecretkey
+$ sudo docker exec -it python-certificate-transparency-log-downloader-minio-1   mc admin accesskey create myminio/ minioadmin  --access-key myuseraccesskey --secret-key myusersecretkey
 Access Key: myuseraccesskey
 Secret Key: myusersecretkey
 Expiration: NONE
@@ -79,7 +83,7 @@ Description:
 ```
 Create bucket where CT archives will be saved.
 ```bash
-$ sudo docker exec -it ct-minio-1  mc mb myminio/dev
+$ sudo docker exec -it python-certificate-transparency-log-downloader-minio-1 mc mb myminio/dev
 Bucket created successfully `myminio/dev`.
 ```
 
@@ -127,7 +131,6 @@ Found 902 more items. New tree size: 115846808 old tree size: 115845906 url: htt
 Found 0 more items. New tree size: 3822 old tree size: 3822 url: https://elephant2027h2.ct.sectigo.com/
 Found 35 more items. New tree size: 1591655 old tree size: 1591620 url: https://oak.ct.letsencrypt.org/2026h2/
 ...
-```
 
 ## Recommended Use
 Run one instance of the script for each CT log you want downloaded. The results are real-time saved to disk and written to an S3 bucket during a log rotate. The CT download progress, as well as the max tree size, are maintained in DynamoDB.
