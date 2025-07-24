@@ -130,7 +130,7 @@ $python3 ./download_ct_logs.py --update-tree-size
 Found 902 more items. New tree size: 115846808 old tree size: 115845906 url: https://sphinx.ct.digicert.com/2026h1/
 Found 0 more items. New tree size: 3822 old tree size: 3822 url: https://elephant2027h2.ct.sectigo.com/
 Found 35 more items. New tree size: 1591655 old tree size: 1591620 url: https://oak.ct.letsencrypt.org/2026h2/
-...
+```
 
 ## Recommended Use
 Run one instance of the script for each CT log you want downloaded. The results are real-time saved to disk and written to an S3 bucket during a log rotate. The CT download progress, as well as the max tree size, are maintained in DynamoDB.
