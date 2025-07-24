@@ -1,0 +1,8 @@
+requests
+boto3
+tqdm
+tldextract
+ua_generator
+pyOpenSSL
+construct
+pkilint
