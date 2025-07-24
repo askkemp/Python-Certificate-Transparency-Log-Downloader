@@ -1,7 +1,3 @@
-<p align="center">
-  <img src="./logo.png" height="100" />
-</p>
-
 # Introduction
 A Python 3.11+ monolithic script to download Certificate Transparency (CT) logs  (see [Certificate Transparency Project]( https://certificate.transparency.dev/ "Certificate Transparency Project")) and extract specific metadata. The below metadata is captured for each certificate:
 
