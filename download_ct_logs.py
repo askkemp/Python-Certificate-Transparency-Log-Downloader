@@ -38,10 +38,10 @@ import pkilint.pkix
 # - This is used to set the S3 bucket name and DynamoDB table name.
 
 # Dynamodb table name
-CT_STATE_TABLE = "CT_STATE_TABLE_DEV"
+CT_STATE_TABLE = "CT_STATE_TABLE"
 
 # S3 bucket name
-S3_BUCKET = "dev"
+S3_BUCKET = "ct-results"
 
 # AWS Boto3 setup (DynamoDB and S3)
 dynamodb = boto3.resource(
@@ -88,10 +88,11 @@ def rotator(source: str, dest: str) -> None:
     with open(source, 'rb') as f_in:
         with gzip.open(dest, 'wb') as f_out:
             shutil.copyfileobj(f_in, f_out)
+    short_uuid = str(uuid.uuid4())[:4] # needed to prevent overwritting same file in S3
     upload_key_name = (
-        f"{dest_filename}-"
-        f"{datetime.datetime.now().strftime('%Y-%m-%d')}.gz" # includig date in the filename for possible future debugging
-    ) # e.g. ct_d2fe2110-4a6c-4dc0-a556-8e7556beaf4d-2025-05-30.gz
+        f"{dest_filename}-{short_uuid}-"
+        f"{datetime.datetime.now().strftime('%Y-%m-%dT%H')}.gz"  # including date in the filename for possible future debugging
+    )  # e.g. ct_d2fe2110-4a6c-4dc0-a556-8e7556beaf4d-1a2b-2025-05-30.gz
     stdoutlogger.warning(f"Uploading {upload_key_name} to S3 bucket {S3_BUCKET}")
     s3.upload_file(dest, S3_BUCKET, upload_key_name)
     # Check if the file exists in S3 after upload
@@ -479,6 +480,13 @@ def fetch_and_process_ct_log_entries(s: requests.Session, ct_log_url: str, start
             f"\nfetch_and_process_ct_log_entries - {e}: General ConnectionError on {ct_log_url}ct/v1/get-entries?start={start}&end={end}"
         )
         time.sleep(120) # hopefully it will come back
+        throttled = True
+        return (throttled, 0)
+    except requests.exceptions.ChunkedEncodingError as e:
+        stdoutlogger.error(
+            f"\nfetch_and_process_ct_log_entries - {e}: ChunkedEncodingError (response ended prematurely) on {ct_log_url}ct/v1/get-entries?start={start}&end={end}"
+        )
+        time.sleep(120)
         throttled = True
         return (throttled, 0)
     except Exception as e:
