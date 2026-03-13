@@ -633,7 +633,7 @@ def tile_fetch_and_process_ct_log_entries(s: requests.Session, url: str, tile_in
             stdoutlogger.debug(f'Bytes returned from CT url: {len(response.content)}')
             tile_process_log_entry(response.content, expected_entries=256)  # expected_entries allows for future extension to deal with partial tiles
             return (throttled, len(response.content))
-        elif response.status_code == 500: # Internal Server Error
+        elif response.status_code == 500 or response.status_code == 502 or response.status_code == 503 or response.status_code == 520: # Internal Server Error or Bad Gateway or Service Unavailable or Cloudflare's 520 Unknown Error
             stdoutlogger.warning(f"HTTP {response.status_code} on {tile_url}")
             throttled = True
             return (throttled, 0)
